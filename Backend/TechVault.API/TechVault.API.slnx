@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../TechVault.Inventory/TechVault.Inventory.csproj" Id="de6fd092-4507-4a65-accb-9898c0942419" />
+  <Project Path="TechVault.API.csproj" />
+</Solution>
