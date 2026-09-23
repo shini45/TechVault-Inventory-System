@@ -12,15 +12,15 @@ using System.Net.Http.Json;
 
 namespace TechVault.Inventory
 {
-    public partial class Form1 : Form
+    public partial class TechVault : Form
     {
         int selectedItemId = 0;
         List<Item> allItems = new List<Item>();
         HttpClient client = new HttpClient();
 
-        string apiUrl = "https://localhost:7270/api/items";
+        string apiUrl = "https://localhost:7270/api/Items";
 
-        public Form1()
+        public TechVault()
         {
             InitializeComponent();
 
@@ -52,6 +52,7 @@ namespace TechVault.Inventory
 };
 
             dgvItems.ClearSelection();
+            _ = LoadTransactionAuditLogs();
             selectedItemId = 0;
 
             btnUpdate.Enabled = false;
@@ -68,7 +69,6 @@ namespace TechVault.Inventory
 
                 dgvItems.DataSource = items;
 
-                // DataGridView Formatting
                 dgvItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
                 dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dgvItems.MultiSelect = false;
@@ -77,26 +77,20 @@ namespace TechVault.Inventory
 
                 ApplyLowStockWarning();
 
-                // Header style
                 dgvItems.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                 dgvItems.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                // Cell alignment
                 dgvItems.Columns["Id"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 dgvItems.Columns["StockQuantity"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 dgvItems.Columns["UnitPrice"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
 
-                // Row height
                 dgvItems.RowTemplate.Height = 30;
 
-                // Column Width
                 SetDataGridColumnWidth();
 
-                // Price format
                 dgvItems.Columns["UnitPrice"].DefaultCellStyle.Format = "N2";
                 dgvItems.Columns["UnitPrice"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
 
-                // Low Stock Warning
                 foreach (DataGridViewRow row in dgvItems.Rows)
                 {
                     if (row.Cells["StockQuantity"].Value != null)
@@ -124,12 +118,12 @@ namespace TechVault.Inventory
         private void SetDataGridColumnWidth()
         {
             dgvItems.Columns["Id"].Width = 50;
-            dgvItems.Columns["Name"].Width = 180;
-            dgvItems.Columns["Code"].Width = 120;
+            dgvItems.Columns["Name"].Width = 240;
+            dgvItems.Columns["Code"].Width = 100;
             dgvItems.Columns["Brand"].Width = 100;
             dgvItems.Columns["Category"].Width = 100;
-            dgvItems.Columns["StockQuantity"].Width = 120;
-            dgvItems.Columns["UnitPrice"].Width = 150;
+            dgvItems.Columns["StockQuantity"].Width = 105;
+            dgvItems.Columns["UnitPrice"].Width = 110;
         }
 
         private void ApplyLowStockWarning()
@@ -169,7 +163,6 @@ namespace TechVault.Inventory
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            // validation
             if (string.IsNullOrWhiteSpace(txtName.Text) ||
                 string.IsNullOrWhiteSpace(txtCode.Text) ||
                 string.IsNullOrWhiteSpace(txtBrand.Text) ||
@@ -181,21 +174,18 @@ namespace TechVault.Inventory
                 return;
             }
 
-            // check price
             if (!decimal.TryParse(txtUnitPrice.Text, out decimal price))
             {
                 MessageBox.Show("Please enter a valid price.");
                 return;
             }
 
-            // check stock
             if (!int.TryParse(txtStockQuantity.Text, out int stock))
             {
                 MessageBox.Show("Please enter a valid stock quantity.");
                 return;
             }
 
-            // create item
             var item = new Item
             {
                 Name = txtName.Text,
@@ -206,15 +196,12 @@ namespace TechVault.Inventory
                 UnitPrice = price
             };
 
-            // send to API
             await client.PostAsJsonAsync(apiUrl, item);
 
             MessageBox.Show("Item added successfully!");
 
-            // refresh DataGrid
             await LoadItems();
 
-            // clear textbox
             txtName.Clear();
             txtCode.Clear();
             txtBrand.Clear();
@@ -249,7 +236,6 @@ namespace TechVault.Inventory
                 btnDelete.Enabled = false;
                 selectedItemId = 0;
 
-                // clear fields after delete
                 txtName.Clear();
                 txtCode.Clear();
                 txtBrand.Clear();
@@ -351,10 +337,8 @@ namespace TechVault.Inventory
             MessageBox.Show("Item updated successfully!");
 
 
-            // refresh datagrid
             await LoadItems();
 
-            // clear fields
             txtName.Clear();
             txtCode.Clear();
             txtBrand.Clear();
@@ -419,5 +403,90 @@ namespace TechVault.Inventory
                 dgvItems.ClearSelection();
             }
         }
+
+        private async Task LoadTransactionAuditLogs()
+        {
+            try
+            {
+                string transactionUrl = "https://localhost:7270/api/Items/transactions";
+                var logs = await client.GetFromJsonAsync<List<TransactionEntryDto>>(transactionUrl);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Audit system tracking delayed temporarily: {ex.Message}");
+            }
+        }
+
+        private async void btnAdvancedStockIn_Click(object sender, EventArgs e)
+        {
+            if (dgvItems.CurrentRow == null) return;
+
+            int selectedId = Convert.ToInt32(dgvItems.CurrentRow.Cells["Id"].Value);
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Enter item quantity payload count to RESTOCK (STOCK IN):", "Inventory Ledger Management Intake", "10");
+            if (int.TryParse(input, out int addQty) && addQty > 0)
+            {
+                string restockUrl = $"https://localhost:7270/api/Items/{selectedId}/restock";
+                var response = await client.PutAsJsonAsync(restockUrl, addQty);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Stock allocation successfully committed and logged to SQL Server!", "Transaction Verified", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await LoadItems();
+                    await LoadTransactionAuditLogs();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to sync structural ledger data stream pipeline.", "API Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private async void btnAdvancedStockOut_Click(object sender, EventArgs e)
+        {
+            if (dgvItems.CurrentRow == null) return;
+
+            int selectedId = Convert.ToInt32(dgvItems.CurrentRow.Cells["Id"].Value);
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Enter item value allocation units count to DISPATCH (STOCK OUT):", "Inventory Ledger Dispatch System", "5");
+            if (int.TryParse(input, out int deductQty) && deductQty > 0)
+            {
+                string stockOutUrl = $"https://localhost:7270/api/Items/{selectedId}/stock-out";
+                var response = await client.PutAsJsonAsync(stockOutUrl, deductQty);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Inventory stock transaction safely logged and committed to SQL Server!", "Transaction Verified", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await LoadItems();
+                    await LoadTransactionAuditLogs();
+                }
+                else
+                {
+                    MessageBox.Show("Insufficient product capacity parameters or negative allocation exception block.", "Operation Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private void btnAdvancedStockIn_Click_1(object sender, EventArgs e)
+        {
+            btnAdvancedStockIn_Click(sender, e);
+        }
+
+        private void btnAdvancedStockOut_Click_1(object sender, EventArgs e)
+        {
+            btnAdvancedStockOut_Click(sender, e);
+        }
     }
+
+    public class TransactionEntryDto
+    {
+        public int Id { get; set; }
+        public int ItemId { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public int QuantityChanged { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public string Remarks { get; set; } = string.Empty;
+    }
+
 }

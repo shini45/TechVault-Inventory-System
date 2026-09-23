@@ -1,6 +1,6 @@
 ﻿namespace TechVault.Inventory
 {
-    partial class Form1
+    partial class TechVault
     {
         /// <summary>
         /// Required designer variable.
@@ -50,6 +50,8 @@
             btnClear = new Button();
             txtSearch = new TextBox();
             lblSearch = new Label();
+            btnAdvancedStockOut = new Button();
+            btnAdvancedStockIn = new Button();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvItems).BeginInit();
             SuspendLayout();
@@ -220,10 +222,10 @@
             // 
             // btnAdd
             // 
-            btnAdd.BackColor = Color.FromArgb(129, 199, 132);
+            btnAdd.BackColor = Color.FromArgb(149, 117, 205);
             btnAdd.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnAdd.ForeColor = Color.White;
-            btnAdd.Location = new Point(192, 310);
+            btnAdd.Location = new Point(93, 310);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(94, 29);
             btnAdd.TabIndex = 7;
@@ -236,7 +238,7 @@
             btnUpdate.BackColor = Color.FromArgb(149, 117, 205);
             btnUpdate.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnUpdate.ForeColor = Color.White;
-            btnUpdate.Location = new Point(302, 310);
+            btnUpdate.Location = new Point(202, 310);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(108, 29);
             btnUpdate.TabIndex = 8;
@@ -246,10 +248,10 @@
             // 
             // btnDelete
             // 
-            btnDelete.BackColor = Color.FromArgb(239, 154, 154);
+            btnDelete.BackColor = Color.FromArgb(149, 117, 205);
             btnDelete.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnDelete.ForeColor = Color.White;
-            btnDelete.Location = new Point(432, 310);
+            btnDelete.Location = new Point(329, 310);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(97, 29);
             btnDelete.TabIndex = 9;
@@ -259,10 +261,10 @@
             // 
             // btnRefresh
             // 
-            btnRefresh.BackColor = Color.FromArgb(144, 202, 249);
+            btnRefresh.BackColor = Color.FromArgb(149, 117, 205);
             btnRefresh.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnRefresh.ForeColor = Color.White;
-            btnRefresh.Location = new Point(544, 310);
+            btnRefresh.Location = new Point(441, 310);
             btnRefresh.Name = "btnRefresh";
             btnRefresh.Size = new Size(94, 29);
             btnRefresh.TabIndex = 10;
@@ -278,21 +280,22 @@
             dgvItems.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dgvItems.BackgroundColor = Color.FromArgb(250, 247, 255);
             dgvItems.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvItems.Location = new Point(51, 410);
+            dgvItems.Location = new Point(44, 417);
             dgvItems.Name = "dgvItems";
             dgvItems.ReadOnly = true;
             dgvItems.RowHeadersWidth = 51;
             dgvItems.RowTemplate.Height = 30;
-            dgvItems.Size = new Size(870, 250);
+            dgvItems.ScrollBars = ScrollBars.Vertical;
+            dgvItems.Size = new Size(877, 258);
             dgvItems.TabIndex = 11;
             dgvItems.CellContentClick += dgvItems_CellContentClick;
             // 
             // btnClear
             // 
-            btnClear.BackColor = Color.FromArgb(244, 143, 177);
+            btnClear.BackColor = Color.FromArgb(149, 117, 205);
             btnClear.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnClear.ForeColor = Color.White;
-            btnClear.Location = new Point(663, 310);
+            btnClear.Location = new Point(552, 310);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(94, 29);
             btnClear.TabIndex = 12;
@@ -320,12 +323,40 @@
             lblSearch.Text = "Search:";
             lblSearch.Click += label4_Click_1;
             // 
+            // btnAdvancedStockOut
+            // 
+            btnAdvancedStockOut.BackColor = Color.FromArgb(149, 117, 205);
+            btnAdvancedStockOut.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnAdvancedStockOut.ForeColor = Color.White;
+            btnAdvancedStockOut.Location = new Point(780, 310);
+            btnAdvancedStockOut.Name = "btnAdvancedStockOut";
+            btnAdvancedStockOut.Size = new Size(102, 29);
+            btnAdvancedStockOut.TabIndex = 15;
+            btnAdvancedStockOut.Text = "- Stock Out";
+            btnAdvancedStockOut.UseVisualStyleBackColor = false;
+            btnAdvancedStockOut.Click += btnAdvancedStockOut_Click_1;
+            // 
+            // btnAdvancedStockIn
+            // 
+            btnAdvancedStockIn.BackColor = Color.FromArgb(149, 117, 205);
+            btnAdvancedStockIn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnAdvancedStockIn.ForeColor = Color.White;
+            btnAdvancedStockIn.Location = new Point(661, 310);
+            btnAdvancedStockIn.Name = "btnAdvancedStockIn";
+            btnAdvancedStockIn.Size = new Size(102, 29);
+            btnAdvancedStockIn.TabIndex = 16;
+            btnAdvancedStockIn.Text = "+ Stock In";
+            btnAdvancedStockIn.UseVisualStyleBackColor = false;
+            btnAdvancedStockIn.Click += btnAdvancedStockIn_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(245, 240, 255);
-            ClientSize = new Size(971, 681);
+            ClientSize = new Size(972, 705);
+            Controls.Add(btnAdvancedStockIn);
+            Controls.Add(btnAdvancedStockOut);
             Controls.Add(lblSearch);
             Controls.Add(txtSearch);
             Controls.Add(btnClear);
@@ -369,5 +400,7 @@
         private TextBox txtStockQuantity;
         private TextBox txtSearch;
         private Label lblSearch;
+        private Button btnAdvancedStockOut;
+        private Button btnAdvancedStockIn;
     }
 }
